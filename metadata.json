@@ -1,0 +1,5 @@
+{
+  "name": "独秀指数计算器",
+  "description": "使用独秀指数（收入/生活成本）计算您的个人财务健康状况。可视化开支并获得AI驱动的财务建议。",
+  "requestFramePermissions": []
+}

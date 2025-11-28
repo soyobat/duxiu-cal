@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#F8FAFC">
+    <title>独秀指数计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', "Segoe UI", 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            },
+            screens: {
+              'xs': '375px',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root {
+        /* Define CSS Variables for Safe Areas with fallbacks */
+        --sat: env(safe-area-inset-top, 0px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sal: env(safe-area-inset-left, 0px);
+        --sar: env(safe-area-inset-right, 0px);
+        
+        --nav-height: 4rem; /* 64px */
+        --header-height: 3.5rem; /* 56px */
+      }
+      
+      html {
+        height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+        overscroll-behavior-y: none; /* Prevent Pull-to-refresh / Rubber banding on body */
+      }
+      body {
+        height: 100dvh;
+        overflow: hidden; /* Lock body scroll, let React handle internal scrolling */
+        background-color: #F8FAFC;
+        -webkit-font-smoothing: antialiased;
+        touch-action: manipulation; /* Improve touch response */
+        padding-left: var(--sal);
+        padding-right: var(--sar);
+      }
+      
+      /* Mobile Optimizations */
+      input, textarea, select, button {
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Hide number input spinners */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      input[type=number] {
+        -moz-appearance: textfield;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      
+      /* Safe Area Utilities */
+      .pt-safe { padding-top: var(--sat); }
+      .pb-safe { padding-bottom: var(--sab); }
+      
+      /* Dynamic Padding for Scroll Views to clear fixed Nav bars */
+      .pb-safe-nav { padding-bottom: calc(var(--sab) + var(--nav-height) + 1.5rem); } 
+      .pt-safe-header { padding-top: calc(var(--sat) + var(--header-height)); }
+      
+      /* Animation Utilities */
+      .animate-blob {
+        animation: blob 7s infinite;
+      }
+      .animation-delay-2000 {
+        animation-delay: 2s;
+      }
+      @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-100 selection:text-indigo-900">
+    <div id="root" class="h-full w-full"></div>
+  </body>
+</html>
