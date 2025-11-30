@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { FinancialData, Language } from '../types';
-import { Wallet, Home, ShoppingCart, Car, Zap, Coffee, ShoppingBag, Save, Calendar, ChevronRight, Layers, CreditCard, RotateCcw } from 'lucide-react';
+import { Wallet, Home, ShoppingCart, Car, Zap, Coffee, ShoppingBag, Save, Calendar, ChevronRight, CreditCard, RotateCcw } from 'lucide-react';
 import { translations } from '../utils/i18n';
 
 interface InputSectionProps {
@@ -71,30 +70,49 @@ const InputSection: React.FC<InputSectionProps> = ({ data, onChange, selectedMon
       
       {/* Date & Income Card */}
       <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none p-5 border border-slate-100 dark:border-slate-700/50">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50 relative">
-             <div className="flex items-center gap-3">
-               <div className="p-2 rounded-xl transition-colors bg-slate-100 dark:bg-slate-700">
+        <label 
+            className="relative block mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50 group cursor-pointer"
+        >
+             <div className="flex items-center gap-3 pointer-events-none">
+               <div className="p-2 rounded-xl transition-colors bg-slate-100 dark:bg-slate-700 group-hover:bg-slate-200 dark:group-hover:bg-slate-600">
                  <Calendar className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                </div>
                <div>
                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">{t.monthLabel}</p>
-                 <div className="relative">
-                   {/* Visual Text Layer */}
-                   <span className="block font-bold text-sm pointer-events-none absolute inset-0 z-10 bg-white dark:bg-slate-800 pt-0.5 whitespace-nowrap text-slate-800 dark:text-slate-100">
+                 <div className="flex items-center gap-1 mt-0.5">
+                   <span className="font-bold text-sm text-slate-800 dark:text-slate-100">
                      {formatMonthDisplay(selectedMonth)}
                    </span>
-                   {/* Hidden Real Input */}
-                   <input 
-                    type="month" 
-                    value={selectedMonth}
-                    onChange={(e) => onMonthChange(e.target.value)}
-                    className="opacity-0 relative z-20 w-32 h-6 cursor-pointer"
-                   />
+                   <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors" />
                  </div>
                </div>
-               <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 -ml-1" />
              </div>
-        </div>
+             
+             {/* 
+                Overlay Input
+                We position it absolutely covering the entire div.
+                Opacity 0 keeps it hidden but interactive.
+                This ensures maximum compatibility for triggering date pickers on touch devices.
+                Added showPicker() trigger for better desktop support.
+             */}
+             <input 
+              type="month" 
+              value={selectedMonth}
+              onChange={(e) => onMonthChange(e.target.value)}
+              onClick={(e) => {
+                try {
+                  if ('showPicker' in HTMLInputElement.prototype) {
+                    e.currentTarget.showPicker();
+                  }
+                } catch (err) {
+                  // Ignore errors (e.g. if browser blocks programmatic open)
+                  console.debug('Picker open failed', err);
+                }
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              aria-label={t.monthLabel}
+             />
+        </label>
 
         <div>
           <label className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3">
