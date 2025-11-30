@@ -1,18 +1,21 @@
 
 import React, { useState } from 'react';
-import { AppSettings, Language, Theme, Currency } from '../types';
+import { AppSettings, Language, Theme, Currency, HistoryRecord } from '../types';
 import { translations } from '../utils/i18n';
-import { Moon, Sun, Globe, Key, Trash2, Info, ChevronRight, Coins, Eye, EyeOff } from 'lucide-react';
+import { Moon, Sun, Globe, Key, Trash2, Info, ChevronRight, Coins, Eye, EyeOff, Database, Download, Upload, Copy, Check } from 'lucide-react';
 
 interface SettingsSectionProps {
   settings: AppSettings;
   onUpdate: (newSettings: AppSettings) => void;
   onClearData: () => void;
+  history: HistoryRecord[];
+  onImportHistory: (history: HistoryRecord[]) => void;
 }
 
-const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, onClearData }) => {
+const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, onClearData, history, onImportHistory }) => {
   const t = translations[settings.language].settings;
   const [showApiKey, setShowApiKey] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ ...settings, apiKey: e.target.value });
@@ -35,6 +38,71 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, o
       onClearData();
       alert(t.clearDataSuccess);
     }
+  };
+
+  const handleExportFile = () => {
+    const backup = {
+      version: 1,
+      timestamp: Date.now(),
+      history,
+      settings
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Duxiu_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyData = async () => {
+    const backup = {
+      version: 1,
+      timestamp: Date.now(),
+      history,
+      settings
+    };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(backup, null, 2));
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy!', err);
+    }
+  };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        // Basic validation
+        if (json.history && Array.isArray(json.history)) {
+           if (window.confirm(t.importConfirm)) {
+             onImportHistory(json.history);
+             if (json.settings) {
+                // Merge settings to avoid breaking changes if keys are missing in old backups
+                onUpdate({...settings, ...json.settings});
+             }
+             alert(t.importSuccess);
+           }
+        } else {
+            alert(t.importError);
+        }
+      } catch (err) {
+        alert(t.importError);
+        console.error(err);
+      }
+      // Reset input value so same file can be selected again if needed
+      e.target.value = '';
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -72,6 +140,57 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, o
           >
             {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
+        </div>
+      </div>
+
+      {/* Data Backup & Restore */}
+      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none p-5 border border-slate-100 dark:border-slate-700/50">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-teal-50 dark:bg-teal-900/30 rounded-xl">
+                <Database className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+            </div>
+            <div>
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{t.dataTitle}</h3>
+            </div>
+        </div>
+
+        <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+                <button 
+                    onClick={handleExportFile}
+                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+                >
+                    <Download className="w-5 h-5 text-indigo-500" />
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{t.exportButton}</span>
+                </button>
+
+                <button 
+                    onClick={handleCopyData}
+                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+                >
+                    {copySuccess ? <Check className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-slate-500" />}
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        {copySuccess ? t.copySuccess : t.copyButton}
+                    </span>
+                </button>
+            </div>
+
+            <div className="relative">
+                 <input 
+                    type="file" 
+                    id="backup-upload" 
+                    className="hidden" 
+                    accept=".json" 
+                    onChange={handleImportFile}
+                />
+                <label 
+                    htmlFor="backup-upload"
+                    className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold cursor-pointer transition-all active:scale-95 shadow-lg shadow-indigo-500/20"
+                >
+                    <Upload className="w-4 h-4" />
+                    <span className="text-sm">{t.importButton}</span>
+                </label>
+            </div>
         </div>
       </div>
 

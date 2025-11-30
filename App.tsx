@@ -366,7 +366,13 @@ const App: React.FC = () => {
           {/* TAB 4: SETTINGS */}
           {activeTab === 'settings' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <SettingsSection settings={settings} onUpdate={setSettings} onClearData={handleClearData} />
+              <SettingsSection 
+                settings={settings} 
+                onUpdate={setSettings} 
+                onClearData={handleClearData} 
+                history={history}
+                onImportHistory={setHistory}
+              />
             </div>
           )}
 
