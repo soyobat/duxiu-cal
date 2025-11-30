@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { AppSettings, Language, Theme, Currency } from '../types';
 import { translations } from '../utils/i18n';
-import { Moon, Sun, Globe, Key, Trash2, Info, ChevronRight, Coins } from 'lucide-react';
+import { Moon, Sun, Globe, Key, Trash2, Info, ChevronRight, Coins, Eye, EyeOff } from 'lucide-react';
 
 interface SettingsSectionProps {
   settings: AppSettings;
@@ -11,6 +12,7 @@ interface SettingsSectionProps {
 
 const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, onClearData }) => {
   const t = translations[settings.language].settings;
+  const [showApiKey, setShowApiKey] = useState(false);
 
   const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ ...settings, apiKey: e.target.value });
@@ -52,17 +54,24 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({ settings, onUpdate, o
         
         <div className="relative">
           <input 
-            type="text" 
+            type={showApiKey ? "text" : "password"}
             value={settings.apiKey}
             onChange={handleApiKeyChange}
             placeholder={t.apiKeyPlaceholder}
-            className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600"
+            className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-4 pr-12 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600"
             autoCorrect="off" 
             autoCapitalize="off" 
             autoComplete="off"
             spellCheck="false"
             enterKeyHint="done"
           />
+          <button
+            type="button"
+            onClick={() => setShowApiKey(!showApiKey)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          >
+            {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
       </div>
 
