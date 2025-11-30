@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { HistoryRecord, Language } from '../types';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { TrendingUp, Trash2, Calendar, FileQuestion, ChevronRight, MoreHorizontal, Plus } from 'lucide-react';
 import { translations } from '../utils/i18n';
 
@@ -98,13 +98,30 @@ const TrendSection: React.FC<TrendSectionProps> = ({ history, onDelete, onLoad, 
                     return value;
                   }}
                 />
-                <YAxis hide />
+                <YAxis hide domain={[0, (dataMax: number) => Math.max(dataMax, 2.2)]} />
                 <Tooltip 
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', backgroundColor: '#fff' }}
                     itemStyle={{ color: '#1e293b' }}
                     formatter={(value: number) => value.toFixed(2)}
                     labelStyle={{ color: '#64748B', marginBottom: '4px', fontSize: '12px' }}
                 />
+                
+                {/* Reference Lines for Duxiu Index Thresholds */}
+                <ReferenceLine 
+                    y={1} 
+                    stroke="#3b82f6" 
+                    strokeDasharray="4 4" 
+                    strokeOpacity={0.6}
+                    label={{ value: '1.0', position: 'insideRight', fill: '#3b82f6', fontSize: 10, dy: -8, fontWeight: 500 }} 
+                />
+                <ReferenceLine 
+                    y={2} 
+                    stroke="#10b981" 
+                    strokeDasharray="4 4" 
+                    strokeOpacity={0.6}
+                    label={{ value: '2.0', position: 'insideRight', fill: '#10b981', fontSize: 10, dy: -8, fontWeight: 500 }} 
+                />
+
                 <Area 
                   type="monotone" 
                   dataKey="index" 
